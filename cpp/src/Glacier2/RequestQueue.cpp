@@ -95,22 +95,38 @@ Glacier2::Request::invoke(const Callback_Object_ice_invokePtr& cb)
             {
                 Ice::Context ctx = _current.ctx;
                 ctx.insert(_sslContext.begin(), _sslContext.end());
+#ifdef ICE_CPP11_MAPPING
+                result = _proxy->ice_invokeAsync(_current.operation, _current.mode, inPair, cb->response, cb->ex, cb->sent, ctx);
+#else
                 result = _proxy->begin_ice_invoke(_current.operation, _current.mode, inPair, ctx, cb, this);
+#endif
             }
             else
             {
+#ifdef ICE_CPP11_MAPPING
+                result = _proxy->ice_invokeAsync(_current.operation, _current.mode, inPair, cb->response, cb->ex, cb->sent, _current.ctx);
+#else
                 result = _proxy->begin_ice_invoke(_current.operation, _current.mode, inPair, _current.ctx, cb, this);
+#endif
             }
         }
         else
         {
             if(_sslContext.size() > 0)
             {
+#ifdef ICE_CPP11_MAPPING
+                result = _proxy->ice_invokeAsync(_current.operation, _current.mode, inPair, cb->response, cb->exception, cb->sent, _sslContext);
+#else
                 result = _proxy->begin_ice_invoke(_current.operation, _current.mode, inPair, _sslContext, cb, this);
+#endif
             }
             else
             {
+#ifdef ICE_CPP11_MAPPING
+                result = _proxy->ice_invokeAsync(_current.operation, _current.mode, inPair, cb->response, cb->exception, cb->sent);
+#else
                 result = _proxy->begin_ice_invoke(_current.operation, _current.mode, inPair, cb, this);
+#endif
             }
         }
 

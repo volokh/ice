@@ -4,6 +4,8 @@
 //
 // **********************************************************************
 
+#include <exception>
+
 #include <Glacier2/Blobject.h>
 #include <Glacier2/SessionRouterI.h>
 #include <Glacier2/Instrumentation.h>
@@ -79,17 +81,27 @@ void
 Glacier2::Blobject::invokeResponse(bool ok, const pair<const Byte*, const Byte*>& outParams,
                                    const AMD_Object_ice_invokePtr& amdCB)
 {
+#ifdef ICE_CPP11_MAPPING
+    assert(amdCB->response);
+    amdCB->response(ok, outParams);
+#else
     amdCB->ice_response(ok, outParams);
+#endif
 }
 
 void
 Glacier2::Blobject::invokeSent(bool, const AMD_Object_ice_invokePtr& amdCB)
 {
+#ifdef ICE_CPP11_MAPPING
+    assert(amdCB->sent);
+    amdCB->sent(true);
+#else
 #if (defined(_MSC_VER) && (_MSC_VER >= 1600))
     amdCB->ice_response(true, pair<const Byte*, const Byte*>(static_cast<const Byte*>(nullptr),
                                                              static_cast<const Byte*>(nullptr)));
 #else
     amdCB->ice_response(true, pair<const Byte*, const Byte*>(0, 0));
+#endif
 #endif
 }
 
@@ -114,11 +126,17 @@ Glacier2::Blobject::invokeException(const Exception& ex, const AMD_Object_ice_in
             }
         }
     }
+
+#ifdef ICE_CPP11_MAPPING
+    assert(amdCB->exception);
+    amdCB->exception(std::make_exception_ptr(Exception(ex)));
+#else
     amdCB->ice_exception(ex);
+#endif
 }
 
 void
-Glacier2::Blobject::invoke(ObjectPrx& proxy, const AMD_Object_ice_invokePtr& amdCB,
+Glacier2::Blobject::invoke(ObjectPrxPtr& proxy, const AMD_Object_ice_invokePtr& amdCB,
                            const std::pair<const Byte*, const Byte*>& inParams, const Current& current)
 {
     //
@@ -339,7 +357,11 @@ Glacier2::Blobject::invoke(ObjectPrx& proxy, const AMD_Object_ice_invokePtr& amd
             Callback_Object_ice_invokePtr amiCB;
             if(proxy->ice_isTwoway())
             {
+#ifdef ICE_CPP11_MAPPING
+                amiCB = std::make_shared<(&Blobject::invokeResponse, &Blobject::invokeException, nullptr);
+#else
                 amiCB = newCallback_Object_ice_invoke(this, &Blobject::invokeResponse, &Blobject::invokeException);
+#endif
             }
             else
             {

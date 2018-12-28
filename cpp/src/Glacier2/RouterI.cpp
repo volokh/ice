@@ -123,11 +123,19 @@ Glacier2::RouterI::destroy(const Callback_Session_destroyPtr& asyncCB)
 
         if(_context.size() > 0)
         {
+#ifdef ICE_CPP11_MAPPING
+            _session->destroyAsync(asyncCB.response, asyncCB.exception, asyncCB.sent, _context);
+#else
             _session->begin_destroy(_context, asyncCB);
+#endif
         }
         else
         {
+#ifdef ICE_CPP11_MAPPING
+            _session->destroyAsync(asyncCB.response, asyncCB.exception, asyncCB.sent);
+#else
             _session->begin_destroy(asyncCB);
+#endif
         }
     }
 
@@ -169,21 +177,33 @@ Glacier2::RouterI::getCategoryForClient(const Ice::Current&) const
 }
 
 void
+#ifdef ICE_CPP11_MAPPING
+Glacier2::RouterI::createSessionAsync(::std::string, ::std::string, ::std::function<void(const ::std::shared_ptr<SessionPrx>&)> response, ::std::function<void(::std::exception_ptr)>, const ::Ice::Current&)
+#else
 Glacier2::RouterI::createSession_async(const AMD_Router_createSessionPtr&, const std::string&, const std::string&,
                                        const Current&)
+#endif
 {
     assert(false); // Must not be called in this router implementation.
 }
 
 void
+#ifdef ICE_CPP11_MAPPING
+Glacier2::RouterI::createSessionFromSecureConnectionAsync(::std::function<void(const ::std::shared_ptr<SessionPrx>&)> response, ::std::function<void(::std::exception_ptr)>, const ::Ice::Current&)
+#else
 Glacier2::RouterI::createSessionFromSecureConnection_async(const AMD_Router_createSessionFromSecureConnectionPtr&,
                                                            const Current&)
+#endif
 {
     assert(false); // Must not be called in this router implementation.
 }
 
 void
+#ifdef ICE_CPP11_MAPPING
+Glacier2::RouterI::refreshSessionAsync(::std::function<void()>, ::std::function<void(::std::exception_ptr)>, const ::Ice::Current&)
+#else
 Glacier2::RouterI::refreshSession_async(const AMD_Router_refreshSessionPtr&, const ::Ice::Current&)
+#endif
 {
     assert(false); // Must not be called in this router implementation.
 }

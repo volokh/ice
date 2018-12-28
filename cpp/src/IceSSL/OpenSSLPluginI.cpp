@@ -101,7 +101,7 @@ registerIceSSLOpenSSL(bool loadOnInitialize)
 
 }
 
-#else
+#endif
 
 extern "C" ICESSL_API Ice::Plugin*
 createIceSSL(const Ice::CommunicatorPtr& communicator, const string& /*name*/, const Ice::StringSeq& /*args*/)
@@ -125,5 +125,3 @@ IceSSL::Certificate::decode(const std::string& encoding)
 {
     return IceSSL::OpenSSL::Certificate::decode(encoding);
 }
-
-#endif

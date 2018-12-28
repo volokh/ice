@@ -385,6 +385,18 @@ int wmain(int argc, wchar_t* argv[])
 int main(int argc, char* argv[])
 #endif
 {
+//    std::setlocale(LC_ALL, "ru_RU.UTF-8");
+    //printf("codecvt wchar to char: %s\n", IceUtil::wstringToString(L"Привет ывавы!").c_str());
+
+//    printf("codecvt wchar to char: %s\n", IceUtil::wstringToString(IceUtil::stringToWstring("Hello It's my stuff\n")).c_str());
+//    std::wstring_convert<df<std::codecvt<wchar_t, char, std::mbstate_t>>, wchar_t> conv;
+  //  std::wstring str = conv.from_bytes("Hello It's my stuff");
+    //std::string backStr = conv.to_bytes(str.c_str());
+    //printf("codecvt wchar to char: %s\n", backStr.c_str());
+
+    /*std::wstring_convert<df<std::codecvt<char, wchar_t, std::mbstate_t>>, char> convChar;
+    std::string strChar = convChar.to_bytes(L"Привет впвыа!");*/
+
     vector<string> args = Slice::argvToArgs(argc, argv);
     try
     {

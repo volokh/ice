@@ -42,6 +42,11 @@ Slice::FileException::ice_clone() const
 {
     return new FileException(*this);
 }
+#else
+IceUtil::Exception *Slice::FileException::ice_cloneImpl() const
+{
+    return new FileException(*this);
+}
 #endif
 
 void

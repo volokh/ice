@@ -42,7 +42,7 @@
 
 #if !defined(ICE_OS_UWP)
 #    ifndef ICE_HAS_BZIP2
-#        define ICE_HAS_BZIP2
+//#        define ICE_HAS_BZIP2
 #    endif
 #endif
 

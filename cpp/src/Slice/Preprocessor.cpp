@@ -90,7 +90,7 @@ Slice::Preprocessor::addQuotes(const string& arg)
     // Add quotes around the given argument to ensure that arguments
     // with spaces will be preserved as a single argument
     //
-    return "\"" + escapeString(arg, "", IceUtilInternal::Unicode) + "\"";
+    return "\"" + escapeString(arg, "", IceUtilInternal::ToStringMode::Unicode) + "\"";
 }
 
 string
@@ -240,7 +240,7 @@ Slice::Preprocessor::preprocess(bool keepComments, const vector<string>& extraAr
         //
         // First try to open temporay file in tmp directory.
         //
-#ifdef _WIN32
+#if defined(_WIN32)// && !defined(__MINGW32__)
         //
         // We use an unique id as the tmp file name prefix to avoid
         // problems with this code being called concurrently from

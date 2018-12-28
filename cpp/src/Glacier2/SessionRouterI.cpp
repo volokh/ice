@@ -392,6 +392,7 @@ private:
     const SSLInfo _sslInfo;
 };
 
+#ifndef ICE_CPP11_MAPPING
 class CloseCallbackI : public Ice::CloseCallback
 {
 public:
@@ -441,7 +442,7 @@ private:
 
     const SessionRouterIPtr _sessionRouter;
 };
-
+#endif
 }
 
 CreateSession::CreateSession(const SessionRouterIPtr& sessionRouter, const string& user, const Ice::Current& current) :
@@ -673,8 +674,10 @@ SessionRouterI::SessionRouterI(const InstancePtr& instance,
     _sslVerifier(sslVerifier),
     _sslSessionManager(sslSessionManager),
     _sessionTimeout(IceUtil::Time::seconds(_instance->properties()->getPropertyAsInt("Glacier2.SessionTimeout"))),
+#ifndef ICE_CPP11_MAPPING
     _closeCallback(new CloseCallbackI(this)),
     _heartbeatCallback(new HeartbeatCallbackI(this)),
+#endif
     _sessionThread(_sessionTimeout > IceUtil::Time() ? new SessionThread(this, _sessionTimeout) : 0),
     _routersByConnectionHint(_routersByConnection.end()),
     _routersByCategoryHint(_routersByCategory.end()),
@@ -757,8 +760,10 @@ SessionRouterI::destroy()
         sessionThread = _sessionThread;
         _sessionThread = 0;
 
+#ifndef ICE_CPP11_MAPPING
         _closeCallback = 0;
         _heartbeatCallback = 0;
+#endif
 
         swap(destroyCallback, _sessionDestroyCallback); // Break cyclic reference count.
     }
@@ -792,7 +797,11 @@ SessionRouterI::getServerProxy(const Current& current) const
 }
 
 ObjectProxySeq
+#ifdef ICE_CPP11_MAPPING
+SessionRouterI::addProxies(ObjectProxySeq proxies, const Current& current)
+#else
 SessionRouterI::addProxies(const ObjectProxySeq& proxies, const Current& current)
+#endif
 {
     //
     // Forward to the per-client router.
@@ -1271,8 +1280,20 @@ SessionRouterI::finishCreateSession(const ConnectionPtr& connection, const Route
         _routersByCategoryHint = rc.first;
     }
 
+#ifdef ICE_CPP11_MAPPING
+    connection->setCloseCallback([this](const Ice::ConnectionPtr& connection)
+    {
+        destroySession(connection);
+    });
+
+    connection->setHeartbeatCallback([this](const Ice::ConnectionPtr& connection)
+    {
+        refreshSession(connection);
+    });
+#else
     connection->setCloseCallback(_closeCallback);
     connection->setHeartbeatCallback(_heartbeatCallback);
+#endif
 
     if(_sessionTraceLevel >= 1)
     {

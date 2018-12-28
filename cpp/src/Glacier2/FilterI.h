@@ -38,9 +38,14 @@ public:
     //
     // Slice to C++ mapping.
     //
-    virtual void add(const std::vector<T>&, const Ice::Current&);
-    virtual void remove(const std::vector<T>&, const Ice::Current&);
-    virtual std::vector<T> get(const Ice::Current&);
+#ifdef ICE_CPP11_MAPPING
+    void add(std::vector<T>, const Ice::Current&) override;
+    void remove(std::vector<T>, const Ice::Current&) override;
+#else
+    virtual void add(const std::vector<T>&, const Ice::Current&) ICE_OVERRIDE;
+    virtual void remove(const std::vector<T>&, const Ice::Current&) ICE_OVERRIDE;
+#endif
+    virtual std::vector<T> get(const Ice::Current&) ICE_OVERRIDE;
 
     //
     // Internal functions.
@@ -81,7 +86,11 @@ FilterT<T, P>::FilterT(const std::vector<T>& accept):
 }
 
 template<class T, class P> void
+#ifdef ICE_CPP11_MAPPING
+FilterT<T, P>::add(std::vector<T> additions, const Ice::Current&)
+#else
 FilterT<T, P>::add(const std::vector<T>& additions, const Ice::Current&)
+#endif
 {
     //
     // Sort the filter elements first, erasing duplicates. Then we can
@@ -99,7 +108,11 @@ FilterT<T, P>::add(const std::vector<T>& additions, const Ice::Current&)
 }
 
 template<class T, class P> void
+#ifdef ICE_CPP11_MAPPING
+FilterT<T, P>::remove(std::vector<T> deletions, const Ice::Current&)
+#else
 FilterT<T, P>::remove(const std::vector<T>& deletions, const Ice::Current&)
+#endif
 {
     //
     // Our removal algorithm depends on the filter elements to be

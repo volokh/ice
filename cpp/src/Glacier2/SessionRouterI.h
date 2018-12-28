@@ -12,11 +12,19 @@
 
 #include <Ice/Ice.h>
 
+#include <Glacier2/CallbackObject.h>
 #include <Glacier2/PermissionsVerifierF.h>
 #include <Glacier2/Router.h>
 #include <Glacier2/Instrumentation.h>
 
 #include <set>
+
+#ifdef ICE_CPP11_MAPPING
+namespace IceUtil {
+template<typename T>
+using Optional = Ice::optional<T>;
+}
+#endif
 
 namespace Glacier2
 {
@@ -99,12 +107,19 @@ public:
     virtual Ice::ObjectPrxPtr getClientProxy(IceUtil::Optional<bool>&, const Ice::Current&) const ICE_OVERRIDE;
     virtual Ice::ObjectPrxPtr getServerProxy(const Ice::Current&) const ICE_OVERRIDE;
     virtual std::string getCategoryForClient(const Ice::Current&) const ICE_OVERRIDE;
+#ifdef ICE_CPP11_MAPPING
+    Ice::ObjectProxySeq addProxies(Ice::ObjectProxySeq, const Ice::Current&) override;
+    void createSessionAsync(::std::string userId, ::std::string password, ::std::function<void(const ::std::shared_ptr<SessionPrx>& returnValue)> response, ::std::function<void(::std::exception_ptr)> exception, const ::Ice::Current& current) override;
+    void createSessionFromSecureConnectionAsync(::std::function<void(const ::std::shared_ptr<SessionPrx>& returnValue)> response, ::std::function<void(::std::exception_ptr)> exception, const ::Ice::Current& current) override;
+    void refreshSessionAsync(::std::function<void()> response, ::std::function<void(::std::exception_ptr)> exception, const ::Ice::Current& current) override;
+#else
     virtual Ice::ObjectProxySeq addProxies(const Ice::ObjectProxySeq&, const Ice::Current&);
     virtual void createSession_async(const AMD_Router_createSessionPtr&, const std::string&, const std::string&,
                                const Ice::Current&);
     virtual void createSessionFromSecureConnection_async(const AMD_Router_createSessionFromSecureConnectionPtr&,
                                                          const Ice::Current&);
     virtual void refreshSession_async(const AMD_Router_refreshSessionPtr&, const Ice::Current&);
+#endif
     virtual void destroySession(const ::Ice::Current&) ICE_OVERRIDE;
     virtual Ice::Long getSessionTimeout(const ::Ice::Current&) const ICE_OVERRIDE;
     virtual Ice::Int getACMTimeout(const ::Ice::Current&) const ICE_OVERRIDE;
@@ -144,8 +159,10 @@ private:
     const SSLSessionManagerPrx _sslSessionManager;
 
     IceUtil::Time _sessionTimeout;
+#ifndef ICE_CPP11_MAPPING
     Ice::CloseCallbackPtr _closeCallback;
     Ice::HeartbeatCallbackPtr _heartbeatCallback;
+#endif
 
     class SessionThread : public IceUtil::Thread, public IceUtil::Monitor<IceUtil::Mutex>
     {

@@ -9,15 +9,16 @@
 
 #include <IceUtil/Thread.h>
 #include <IceUtil/Monitor.h>
+#include <Ice/VirtualShared.h>
 #include <Ice/Ice.h>
 
+#include <Glacier2/CallbackObject.h>
 #include <Glacier2/Instrumentation.h>
 
 #include <deque>
 
 namespace Glacier2
 {
-
 class Instance;
 typedef IceUtil::Handle<Instance> InstancePtr;
 
@@ -27,7 +28,12 @@ ICE_DEFINE_PTR(RequestPtr, Request);
 class RequestQueueThread;
 typedef IceUtil::Handle<RequestQueueThread> RequestQueueThreadPtr;
 
-class Request : public Ice::LocalObject
+class Request
+#ifdef ICE_CPP11_MAPPING
+    : public IceInternal::EnableSharedFromThis<Request>
+#else
+    : public Ice::LocalObject
+#endif
 {
 public:
 

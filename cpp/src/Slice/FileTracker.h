@@ -25,6 +25,8 @@ public:
     virtual void ice_print(std::ostream&) const;
 #ifndef ICE_CPP11_MAPPING
     virtual FileException* ice_clone() const;
+#else
+    virtual Exception* ice_cloneImpl() const override;
 #endif
     virtual void ice_throw() const;
 

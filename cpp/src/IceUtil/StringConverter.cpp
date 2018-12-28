@@ -70,7 +70,7 @@ public:
 #ifdef _MSC_VER
         assert(_codecvt.max_length() == 4 || _codecvt.max_length() == 6);
 #else
-        assert(_codecvt.max_length() == 4);
+        assert(_codecvt.max_length() <= 4);
 #endif
         if(sourceStart == sourceEnd)
         {
@@ -347,9 +347,20 @@ IceUtil::setProcessWstringConverter(const WstringConverterPtr& converter)
     processWstringConverter = converter;
 }
 
+template<class Facet>
+struct df : Facet
+{
+    template<class ...Args>
+    df(Args&&...args) : Facet(std::forward<Args>(args)...){}
+    ~df(){}
+};
+
 string
 IceUtil::wstringToString(const wstring& v, const StringConverterPtr& converter, const WstringConverterPtr& wConverter)
 {
+    std::wstring_convert<df<std::codecvt<wchar_t, char, std::mbstate_t>>, wchar_t> conv;
+    return conv.to_bytes(v.c_str());
+
     string target;
     if(!v.empty())
     {
@@ -380,6 +391,9 @@ IceUtil::wstringToString(const wstring& v, const StringConverterPtr& converter, 
 wstring
 IceUtil::stringToWstring(const string& v, const StringConverterPtr& converter, const WstringConverterPtr& wConverter)
 {
+    std::wstring_convert<df<std::codecvt<wchar_t, char, std::mbstate_t>>, wchar_t> conv;
+    return conv.from_bytes(v);
+
     wstring target;
     if(!v.empty())
     {
@@ -650,6 +664,7 @@ WindowsStringConverter::fromUTF8(const Byte* sourceStart, const Byte* sourceEnd,
     // WC_ERR_INVALID_CHARS conversion flag is only supported with 65001 (UTF-8) and
     // 54936 (GB18030 Simplified Chinese)
     //
+    DWORD WC_ERR_INVALID_CHARS = 0x80;
     DWORD flags = (_cp == 65001 || _cp == 54936) ? WC_ERR_INVALID_CHARS : 0;
 
     //

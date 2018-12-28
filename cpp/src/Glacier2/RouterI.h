@@ -39,11 +39,19 @@ public:
     virtual Ice::ObjectPrxPtr getServerProxy(const Ice::Current&) const ICE_OVERRIDE;
     virtual Ice::ObjectProxySeq addProxies(const Ice::ObjectProxySeq&, const Ice::Current&) ICE_OVERRIDE;
     virtual std::string getCategoryForClient(const Ice::Current&) const ICE_OVERRIDE;
+
+#ifdef ICE_CPP11_MAPPING
+    void createSessionAsync(::std::string userId, ::std::string password, ::std::function<void(const ::std::shared_ptr<SessionPrx>& returnValue)> response, ::std::function<void(::std::exception_ptr)> exception, const ::Ice::Current& current) override;
+    void createSessionFromSecureConnectionAsync(::std::function<void(const ::std::shared_ptr<SessionPrx>& returnValue)> response, ::std::function<void(::std::exception_ptr)> exception, const ::Ice::Current& current) override;
+    void refreshSessionAsync(::std::function<void()> response, ::std::function<void(::std::exception_ptr)> exception, const ::Ice::Current& current) override;
+#else
     virtual void createSession_async(const AMD_Router_createSessionPtr&, const std::string&, const std::string&,
                                      const Ice::Current&);
     virtual void createSessionFromSecureConnection_async(const AMD_Router_createSessionFromSecureConnectionPtr&,
                                                          const Ice::Current&);
     virtual void refreshSession_async(const AMD_Router_refreshSessionPtr&, const ::Ice::Current&);
+#endif
+
     virtual void destroySession(const ::Ice::Current&) ICE_OVERRIDE;
     virtual Ice::Long getSessionTimeout(const ::Ice::Current&) const ICE_OVERRIDE;
     virtual Ice::Int getACMTimeout(const ::Ice::Current&) const ICE_OVERRIDE;
