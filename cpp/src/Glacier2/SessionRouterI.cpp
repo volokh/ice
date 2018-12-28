@@ -32,7 +32,7 @@ public:
     void
     finished(const Ice::AsyncResultPtr& r)
     {
-        Ice::ObjectPrx o = r->getProxy();
+        Ice::ObjectPrxPtr o = r->getProxy();
         try
         {
             o->end_ice_ping(r);
@@ -64,7 +64,7 @@ public:
     void
     finished(const Ice::AsyncResultPtr& r)
     {
-        Ice::ObjectPrx o = r->getProxy();
+        Ice::ObjectPrxPtr o = r->getProxy();
         try
         {
             o->end_ice_ping(r);
@@ -105,7 +105,7 @@ getIPConnectionInfo(const Ice::ConnectionInfoPtr& info)
 namespace Glacier2
 {
 
-class SessionControlI : public SessionControl
+class SessionControlI ICE_FINAL : public SessionControl
 {
 public:
 
@@ -117,32 +117,32 @@ public:
     {
     }
 
-    virtual StringSetPrx
-    categories(const Current&)
+    virtual StringSetPrxPtr
+    categories(const Current&) ICE_OVERRIDE
     {
         return _filters->categoriesPrx();
     }
 
-    virtual StringSetPrx
-    adapterIds(const Current&)
+    virtual StringSetPrxPtr
+    adapterIds(const Current&) ICE_OVERRIDE
     {
         return _filters->adapterIdsPrx();
     }
 
-    virtual IdentitySetPrx
-    identities(const Current&)
+    virtual IdentitySetPrxPtr
+    identities(const Current&) ICE_OVERRIDE
     {
         return _filters->identitiesPrx();
     }
 
     virtual int
-    getSessionTimeout(const Current& current)
+    getSessionTimeout(const Current& current) ICE_OVERRIDE
     {
         return static_cast<int>(_sessionRouter->getSessionTimeout(current));
     }
 
     virtual void
-    destroy(const Current&)
+    destroy(const Current&) ICE_OVERRIDE
     {
         _sessionRouter->destroySession(_connection);
         _filters->destroy();
@@ -155,7 +155,7 @@ private:
     const FilterManagerPtr _filters;
 };
 
-class ClientLocator : public ServantLocator
+class ClientLocator ICE_FINAL : public ServantLocator
 {
 public:
 
@@ -164,19 +164,19 @@ public:
     {
     }
 
-    virtual ObjectPtr
-    locate(const Current& current, LocalObjectPtr&)
+    ObjectPtr
+    locate(const Current& current, LocalObjectPtr&) ICE_OVERRIDE
     {
         return _sessionRouter->getClientBlobject(current.con, current.id);
     }
 
-    virtual void
-    finished(const Current&, const ObjectPtr&, const LocalObjectPtr&)
+    void
+    finished(const Current&, const ObjectPtr&, const LocalObjectPtr&) ICE_OVERRIDE
     {
     }
 
-    virtual void
-    deactivate(const std::string&)
+    void
+    deactivate(const std::string&) ICE_OVERRIDE
     {
     }
 
@@ -185,7 +185,7 @@ private:
     const SessionRouterIPtr _sessionRouter;
 };
 
-class ServerLocator : public ServantLocator
+class ServerLocator ICE_FINAL : public ServantLocator
 {
 public:
 
@@ -195,18 +195,18 @@ public:
     }
 
     virtual ObjectPtr
-    locate(const Current& current, LocalObjectPtr&)
+    locate(const Current& current, LocalObjectPtr&) ICE_OVERRIDE
     {
         return _sessionRouter->getServerBlobject(current.id.category);
     }
 
     virtual void
-    finished(const Current&, const ObjectPtr&, const LocalObjectPtr&)
+    finished(const Current&, const ObjectPtr&, const LocalObjectPtr&) ICE_OVERRIDE
     {
     }
 
     virtual void
-    deactivate(const std::string&)
+    deactivate(const std::string&) ICE_OVERRIDE
     {
     }
 
@@ -526,7 +526,7 @@ CreateSession::authorized(bool createSession)
         if(_instance->serverObjectAdapter())
         {
             Ice::ObjectPtr obj = new SessionControlI(_sessionRouter, _current.con, _filterManager);
-            _control = SessionControlPrx::uncheckedCast(_instance->serverObjectAdapter()->addWithUUID(obj));
+            _control = ICE_UNCHECKED_CAST(SessionControlPrx, _instance->serverObjectAdapter()->addWithUUID(obj));
         }
         this->createSession();
     }
@@ -777,13 +777,13 @@ SessionRouterI::destroy()
     }
 }
 
-ObjectPrx
+ObjectPrxPtr
 SessionRouterI::getClientProxy(IceUtil::Optional<bool>& hasRoutingTable, const Current& current) const
 {
     return getRouter(current.con, current.id)->getClientProxy(hasRoutingTable, current); // Forward to the per-client router.
 }
 
-ObjectPrx
+ObjectPrxPtr
 SessionRouterI::getServerProxy(const Current& current) const
 {
     return getRouter(current.con, current.id)->getServerProxy(current); // Forward to the per-client router.
@@ -900,7 +900,7 @@ SessionRouterI::refreshSession_async(const AMD_Router_refreshSessionPtr& callbac
         }
     }
 
-    SessionPrx session = router->getSession();
+    SessionPrxPtr session = router->getSession();
     if(session)
     {
         //
@@ -933,7 +933,7 @@ SessionRouterI::refreshSession(const Ice::ConnectionPtr& con)
         }
     }
 
-    SessionPrx session = router->getSession();
+    SessionPrxPtr session = router->getSession();
     if(session)
     {
         //

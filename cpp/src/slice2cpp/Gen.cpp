@@ -3024,7 +3024,17 @@ Slice::Gen::ObjectVisitor::visitClassDefStart(const ClassDefPtr& p)
 
         ClassList allBases = p->allBases();
         StringList ids;
-        transform(allBases.begin(), allBases.end(), back_inserter(ids), ::IceUtil::constMemFun(&Contained::scoped));
+        transform(allBases.begin(), allBases.end(), back_inserter(ids),
+#ifndef ICE_CPP11_MAPPING
+                  ::IceUtil::constMemFun(&Contained::scoped)
+#else
+                  [](const ClassDefPtr &item)
+                  {
+                      return item->scoped();
+                  }
+#endif
+        );
+
         StringList other;
         other.push_back(p->scoped());
         other.push_back("::Ice::Object");
@@ -3165,7 +3175,15 @@ Slice::Gen::ObjectVisitor::visitClassDefEnd(const ClassDefPtr& p)
         {
             StringList allOpNames;
             transform(allOps.begin(), allOps.end(), back_inserter(allOpNames),
-                      ::IceUtil::constMemFun(&Contained::name));
+#ifndef ICE_CPP11_MAPPING
+                      ::IceUtil::constMemFun(&Contained::name)
+#else
+                      [](const OperationPtr &item)
+                      {
+                          return item->name();
+                      }
+#endif
+            );
 
             allOpNames.push_back("ice_id");
             allOpNames.push_back("ice_ids");
@@ -6091,7 +6109,17 @@ Slice::Gen::Cpp11DeclVisitor::visitClassDefStart(const ClassDefPtr& p)
 
         ClassList allBases = p->allBases();
         StringList ids;
-        transform(allBases.begin(), allBases.end(), back_inserter(ids), ::IceUtil::constMemFun(&Contained::scoped));
+        transform(allBases.begin(), allBases.end(), back_inserter(ids),
+#ifndef ICE_CPP11_MAPPING
+                  ::IceUtil::constMemFun(&Contained::scoped)
+#else
+                  [](const ClassDefPtr &item)
+                  {
+                      return item->scoped();
+                  }
+#endif
+        );
+
         StringList other;
         other.push_back(p->scoped());
         other.push_back("::Ice::Object");
@@ -6112,7 +6140,17 @@ Slice::Gen::Cpp11DeclVisitor::visitClassDefStart(const ClassDefPtr& p)
         C << eb << ';';
 
         StringList allOpNames;
-        transform(allOps.begin(), allOps.end(), back_inserter(allOpNames), ::IceUtil::constMemFun(&Contained::name));
+        transform(allOps.begin(), allOps.end(), back_inserter(allOpNames),
+#ifndef ICE_CPP11_MAPPING
+                  ::IceUtil::constMemFun(&Contained::name)
+#else
+                  [](const OperationPtr &item)
+                  {
+                      return item->name();
+                  }
+#endif
+        );
+
         allOpNames.push_back("ice_id");
         allOpNames.push_back("ice_ids");
         allOpNames.push_back("ice_isA");
@@ -7910,7 +7948,17 @@ Slice::Gen::Cpp11InterfaceVisitor::visitClassDefStart(const ClassDefPtr& p)
 
     ClassList allBases = p->allBases();
     StringList ids;
-    transform(allBases.begin(), allBases.end(), back_inserter(ids), ::IceUtil::constMemFun(&Contained::scoped));
+    transform(allBases.begin(), allBases.end(), back_inserter(ids),
+#ifndef ICE_CPP11_MAPPING
+              ::IceUtil::constMemFun(&Contained::scoped)
+#else
+              [](const ClassDefPtr &item)
+              {
+                  return item->scoped();
+              }
+#endif
+    );
+
     StringList other;
     other.push_back(p->scoped());
     other.push_back("::Ice::Object");
@@ -8008,7 +8056,17 @@ Slice::Gen::Cpp11InterfaceVisitor::visitClassDefEnd(const ClassDefPtr& p)
     if(!allOps.empty())
     {
         StringList allOpNames;
-        transform(allOps.begin(), allOps.end(), back_inserter(allOpNames), ::IceUtil::constMemFun(&Contained::name));
+        transform(allOps.begin(), allOps.end(), back_inserter(allOpNames),
+#ifndef ICE_CPP11_MAPPING
+                  ::IceUtil::constMemFun(&Contained::name)
+#else
+                  [](const OperationPtr &item)
+                  {
+                      return item->name();
+                  }
+#endif
+        );
+
         allOpNames.push_back("ice_id");
         allOpNames.push_back("ice_ids");
         allOpNames.push_back("ice_isA");

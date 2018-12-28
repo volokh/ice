@@ -15,7 +15,7 @@ class RoutingTable;
 typedef IceUtil::Handle<RoutingTable> RoutingTablePtr;
 
 class ClientBlobject;
-typedef IceUtil::Handle<ClientBlobject> ClientBlobjectPtr;
+ICE_DEFINE_PTR(ClientBlobjectPtr, ClientBlobject);
 
 class FilterManager;
 typedef IceUtil::Handle<FilterManager> FilterManagerPtr;
