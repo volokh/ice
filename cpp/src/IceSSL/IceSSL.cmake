@@ -18,7 +18,10 @@ list(REMOVE_ITEM SRC_LIST
     "./UWPTransceiverI.cpp"
 )
 
-file(GLOB SLICE2CPP_LIST ${SLICE_GENERATED_DIR}/IceSSL/*.cpp)
+get_target_property(SLICE2CPP_LIST IceSSL_Slice2Cpp ICE2XXX_SOURCES)
+set_source_files_properties(${SLICE2CPP_LIST} PROPERTIES
+    GENERATED TRUE
+)
 list(APPEND SRC_LIST ${SLICE2CPP_LIST})
 
 include_directories(

@@ -1,6 +1,9 @@
 ﻿add_definitions(-DICE_BUILDING_SRC -DGLACIER2_API_EXPORTS)
 
-file(GLOB SLICE2CPP_LIST ${SLICE_GENERATED_DIR}/Glacier2/*.cpp)
+get_target_property(SLICE2CPP_LIST Glacier2_Slice2Cpp ICE2XXX_SOURCES)
+set_source_files_properties(${SLICE2CPP_LIST} PROPERTIES
+    GENERATED TRUE
+)
 aux_source_directory(. SRC_LIST)
 list(APPEND SRC_LIST ${SLICE2CPP_LIST})
 
